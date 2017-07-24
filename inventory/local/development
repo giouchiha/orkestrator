@@ -1,0 +1,54 @@
+########################################
+#####   ANSIBLE INVENTORY          #####
+#### (MARK: LOCAL: ENV: DEVELOPMENT) ###
+########################################
+
+#
+# Global Variables
+#
+[all:vars]
+marca=%PROJECT%
+dns_public_domain=example.com
+dns_private_domain=example.com
+# Git client variables
+infra_git_server_address=bitbucket.org
+infra_git_server_port=22
+infra_git_server_user=git
+itop_git_server_address=bitbucket.org
+itop_git_server_port=22
+itop_git_server_user=git
+
+#
+# Central Servers
+#
+
+[central:children]
+central-devops
+
+[central:vars]
+timezone=America/Mexico_City
+# This user has unlimited sudo privileges, it is create at install time.
+#useradmin_name=local_infra
+useradmin_name=vagrant
+useradmin_pass_hash=$6$TtQMi4HcZPt3uo$I.T0jFv4s/dFKGwMwOVXL7ndirovpiK0T9kVX4f4EEEiUCVTozmjvKNmYjSWSi5hMHYVv4USzWpXSPQ25UWs70
+# This user has limited sudo privileges, it is created post install time.
+aws_support=awsops
+# This user has limited sudo privileges, it is created post install time.
+usersupport_name=local.support
+usersupport_pass_hash=$6$nMdFTqXru$NGApYULG945ugD4iRCIl4CTa1uWOB7MXki6j8sbhWlD4xGNa0tQCfv.u5oZIahx1DFRvQ5Hg/c0k6VpuoUov3/
+# This user has limited sudo privileges, it is created post install time.
+usertime_name=local.time
+usertime_pass_hash=$6$XdIzJKS8$ank/fxeDMlR3idOoFMTHwKoHE6t0M3fs0Kq2W6KCs2/hxbS362rP9sg6P4O9i4SHGkCyW8G9.UWHz0DwiUHyb.
+# This user has unlimited privileges, use it with responsability.
+root_pass_hash=$6$hpd2a699nIC4c$KO6InsyhRQelUt6EAyvc8YjE1d4./ZQ7Ei1e6gYW1pT96VAM9WZQC8dGwAX/aZC7q3QluJ/M.Y4utPPQ/5/OE/
+# Passwords created with:
+# printf 'ch4ng4m3' | mkpasswd -s -m sha-512
+# NOTE: This is a example
+
+[central-devops]
+devops.example.com  ansible_ssh_host=192.168.33.10
+
+[central-devops:vars]
+ansible_ssh_port=22
+ansible_ssh_user=root
+ansible_ssh_private_key_file=/etc/ansible/.ssh/example.dev.infra.admin.rsa

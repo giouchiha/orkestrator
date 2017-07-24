@@ -1,0 +1,13 @@
+---
+- name: Copy Root Authorized Keys for local servers
+
+  hosts: all
+  gather_facts: False
+
+  tasks:
+
+  - name: Setting up directory for root's ssh authorized keys
+    file: path=/root/.ssh state=directory
+
+  - name: Setup SSH authorized keys for root user
+    copy: src=/etc/ansible/.ssh/authorized_keys_for_central_servers dest=/root/.ssh/authorized_keys owner=root group=root mode=0600

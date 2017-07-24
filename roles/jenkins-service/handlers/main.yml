@@ -1,0 +1,5 @@
+---
+# handlers file for jenkins-service
+
+- name: restart jenkins
+  command: java -jar {{ jenkins.cli_dest }} -s http://localhost:{{ jenkins_http_port }} safe-restart --username {{ jenkins_admin_username }} --password {{ jenkins_admin_password }}

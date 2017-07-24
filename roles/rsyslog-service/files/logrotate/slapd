@@ -1,0 +1,10 @@
+/var/log/ldap.log {
+   weekly
+   rotate 4
+   missingok
+   notifempty
+   compress
+   postrotate
+     invoke-rc.d rsyslog reload > /dev/null
+   endscript
+}

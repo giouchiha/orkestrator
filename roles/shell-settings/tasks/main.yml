@@ -1,0 +1,36 @@
+---
+# tasks file for shell-settings
+
+- name: Install bash packages
+  apt: pkg={{item}} state=installed
+  with_items:
+    - bash
+    - bash-completion
+  tags:
+    - shell_settings
+
+- name: Set bash alternative
+  command: update-alternatives --install /bin/sh sh {{default_shell}} 1
+  changed_when: False
+  tags:
+    - shell_settings
+
+- name: Set bash ~/.profile
+  copy: src=bash/root/1404dotprofile dest=/root/.profile owner=root group=root mode=0640 backup=yes
+  tags:
+    - shell_settings
+
+- name: Set bash ~/.bashrc
+  copy: src=bash/root/1404dotbashrc dest=/root/.bashrc owner=root group=root mode=0640 backup=yes
+  tags:
+    - shell_settings
+
+- name: Set bash ~/.bash_local
+  copy: src=bash/root/1404dotbash_local dest=/root/.bash_local owner=root group=root mode=0640 backup=yes
+  tags:
+    - shell_settings
+
+- name: Set bash ~/.bash_aliases
+  copy: src=bash/root/1404dotbash_aliases dest=/root/.bash_aliases owner=root group=root mode=0640 backup=yes
+  tags:
+    - shell_settings

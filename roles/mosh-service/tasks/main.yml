@@ -1,0 +1,24 @@
+---
+# tasks file for mosh-service
+
+- name: Add Mosh Ubuntu Repository
+  apt_repository: repo='ppa:keithw/mosh' state=present
+  tags:
+    - mosh_service
+
+- name: Configure the mosh ppa APT key
+  apt_key: keyserver=keyserver.ubuntu.com id=7BF6DFCD state=present
+  tags:
+    - mosh_service
+
+- name: Update apt cache
+  apt: update_cache=yes
+  tags:
+    - mosh_service
+
+- name: Install mosh packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - mosh
+  tags:
+    - mosh_service

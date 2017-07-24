@@ -1,3 +1,14 @@
+# Local ignores
+*.retry
+*.swp
+*.list
+*.log
+.vagrant
+*.box
+*.iso
+.gitstats
+*.pyc
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

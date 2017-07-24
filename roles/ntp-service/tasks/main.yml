@@ -1,0 +1,39 @@
+---
+# tasks file for ntp-service
+
+- name: Install ntp packages
+  apt: pkg={{item}} state=installed
+  with_items:
+    - ntp
+    - ntpdate
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
+  tags:
+    - ntp_service
+
+- name: Remove ntpdate packages
+  apt: pkg={{item}} state=absent
+  with_items:
+    - ntpdate
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+  tags:
+    - ntp_service
+
+- name: Install ntp packages
+  apt: pkg={{item}} state=installed
+  with_items:
+    - ntp
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+  tags:
+    - ntp_service
+
+- name: Setting up NTP service
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf owner=root group=root mode=0644
+  notify:
+    - restart ntp
+  tags:
+    - ntp_service
+
+- name: Start ntp service
+  service: name=ntp state=started enabled=yes
+  tags:
+    - ntp_service

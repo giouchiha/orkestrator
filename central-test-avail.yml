@@ -1,0 +1,47 @@
+- name: Check availability
+
+  hosts: central
+
+  tasks:
+
+   - name: Check Ubuntu Uptime
+     command: uptime
+     register: result_uptime
+     changed_when: False
+   - debug: msg="The Ubuntu uptime for {{ inventory_hostname }} is {{ result_uptime.stdout }}"
+
+   - name: Check Hostname
+     command: hostname -f
+     register: result_hostname
+     changed_when: False
+   - debug: msg="The hostname for {{ inventory_hostname }} is {{ result_hostname.stdout }}"
+
+   - name: Check IP Address
+     command: hostname -i
+     register: result_ipaddr
+     changed_when: False
+   - debug: msg="The IP Address for {{ inventory_hostname }} is {{ result_ipaddr.stdout }}"
+
+   - name: Check Ubuntu Release
+     command: lsb_release -d
+     register: result_release
+     changed_when: False
+   - debug: msg="The Ubuntu release for {{ inventory_hostname }} is {{ result_release.stdout }}"
+
+   - name: Check Linux Kernel Release
+     command: uname -r
+     register: result_uname
+     changed_when: False
+   - debug: msg="The Linux Kernel release for {{ inventory_hostname }} is {{ result_uname.stdout }}"
+
+   - name: Check Ubuntu Updates
+     command: /usr/lib/update-notifier/update-motd-updates-available
+     register: result_updates_avail
+     changed_when: False
+   - debug: msg="The Ubuntu updates for {{ inventory_hostname }} are {{ result_updates_avail.stdout }}"
+
+#   - name: Check disk space
+#     command: df -h
+#     register: result_df
+#     changed_when: False
+#   - debug: msg="The disk usage for {{ inventory_hostname }} is {{ result_df.stdout }}"

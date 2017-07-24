@@ -1,0 +1,62 @@
+---
+# tasks file for rsyslog-service
+
+- name: Install System logging packages
+  apt: pkg={{item}} state=installed
+  with_items:
+    - logrotate
+    - multitail
+    - bsdutils
+    - rsyslog
+  tags:
+    - rsyslog_service
+
+- name: Set up shell command history to rsyslog
+  copy: src=profile/cmd2syslog.sh dest=/etc/profile.d/cmd2syslog.sh owner=root group=root mode=0644
+  tags:
+    - rsyslog_service
+
+- name: Set up rsyslog service 10-ratelimits
+  copy: src=rsyslog/10-ratelimits.conf dest=/etc/rsyslog.d/10-ratelimits.conf owner=root group=root mode=0644
+  notify:
+    - restart rsyslog
+  tags:
+    - rsyslog_service
+
+- name: Set up rsyslog service 50-default configs
+  copy: src=rsyslog/50-default.conf dest=/etc/rsyslog.d/50-default.conf owner=root group=root mode=0644
+  notify:
+    - restart rsyslog
+  tags:
+    - rsyslog_service
+
+- name: Set up rsyslog service 51-local-custom configs
+  copy: src=rsyslog/51-local-custom.conf dest=/etc/rsyslog.d/51-local-custom.conf  owner=root group=root mode=0644
+  notify:
+    - restart rsyslog
+  tags:
+    - rsyslog_service
+
+- name: Copy rsyslog logrotate custom settings
+  copy: src=logrotate/rsyslog dest=/etc/logrotate.d/rsyslog owner=root group=root mode=0644
+  notify:
+    - restart cron
+  tags:
+    - rsyslog_service
+
+- name: Copy cmdhist logrotate custom settings
+  copy: src=logrotate/cmdhist dest=/etc/logrotate.d/cmdhist owner=root group=root mode=0644
+  notify:
+    - restart cron
+  tags:
+    - rsyslog_service
+
+- name: set multitail rc file
+  copy: src=multitail/1204.multitailrc dest=/root/.multitailrc owner=root group=root mode=0640
+  tags:
+    - rsyslog_service
+
+- name: Start rsyslog service
+  service: name=rsyslog state=started enabled=yes
+  tags:
+    - rsyslog_service

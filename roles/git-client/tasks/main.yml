@@ -1,0 +1,71 @@
+---
+# tasks file for git-client
+
+- name: Installing git client packages
+  apt: pkg={{ item }} state=latest
+  with_items:
+   - git
+  tags:
+    - git_client
+
+- name: Create ssh directory on jenkins home directory
+  file: path=/var/lib/jenkins/.ssh state=directory
+    owner=jenkins
+    group=jenkins
+    mode=0700
+  tags:
+    - git_client_jenkins
+
+- name: Setup ssh client for git for jenkins
+  template: src=ssh-config-jenkins-git-jenkins.j2 dest=/var/lib/jenkins/.ssh/config owner=jenkins group=jenkins mode=0600 backup=yes
+  when: "'central-devops' in group_names"
+  tags:
+    - git_client_jenkins
+
+- name: Setup ssh client for git for ansible
+  template: src=ssh-config-root-git-ansible.j2 dest=/root/.ssh/config owner=root group=root mode=0600 backup=yes
+  when: "'central-devops' in group_names"
+  tags:
+    - git_client_ansible
+
+- name: Setup ssh client for git for itop
+  template: src=ssh-config-root-git-itop.j2 dest=/etc/ssh/ssh_config owner=root group=root mode=0644 backup=yes
+  when: "'central-itop' in group_names"
+  tags:
+    - git_client_itop
+
+- name: Setup ssh keys for user jenkins on devops
+  copy: src=id-{{ marca }}-jenkins.rsa dest=/var/lib/jenkins/.ssh/id-{{ marca }}-jenkins.rsa owner=jenkins group=jenkins mode=0600 backup=yes
+  when: "'central-devops' in group_names"
+  tags:
+    - git_client_jenkins
+
+- name: Setup ssh keys for user root on devops
+  copy: src=id-{{ marca }}-ansible.rsa dest=/root/.ssh/id-{{ marca }}-ansible.rsa owner=root group=root mode=0600 backup=yes
+  when: "'central-devops' in group_names"
+  tags:
+    - git_client_ansible
+
+- name: Setup ssh keys for user root on itop for bitbucket/itop
+  copy: src=llave_git_itop.rsa dest=/etc/ssh/llave_git_itop.rsa owner=root group=root mode=0600 backup=yes
+  when: "'central-itop' in group_names"
+  tags:
+    - git_client_itop
+
+- name: Setup ssh keys for user root on itop for bitbucket/infra
+  copy: src=id-{{ marca }}-ansible.rsa dest=/etc/ssh/id-{{ marca }}-ansible.rsa owner=root group=root mode=0600 backup=yes
+  when: "'central-itop' in group_names"
+  tags:
+    - git_client_itop
+
+- name: Testing ssh connection to infras repo on bitbucket
+  shell: ssh -T bitbucket.org
+  when: "'central-devops' in group_names"
+  tags:
+    - git_client_devops
+
+- name: Testing ssh connection to infras repo on bitbucket
+  shell: ssh -T bitbucket.org
+  when: "'central-itop' in group_names"
+  tags:
+    - git_client_itop

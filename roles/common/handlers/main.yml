@@ -1,0 +1,7 @@
+---
+# handlers file for common
+
+- name: update timezone
+  command: dpkg-reconfigure --frontend noninteractive tzdata
+  tags:
+    - system_settings_timezone

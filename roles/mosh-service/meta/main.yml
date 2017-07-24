@@ -1,0 +1,15 @@
+galaxy_info:
+  author: Jorge Armando medina
+  description: Tasks for setting up local mosh service
+  company: KoolOps
+  license: MIT
+  min_ansible_version: 1.4
+  platforms:
+  - name: Ubuntu
+    versions:
+    - precise
+    - trusty
+    - xenial
+  categories:
+  - networking
+dependencies: []

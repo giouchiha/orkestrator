@@ -1,0 +1,111 @@
+---
+#
+# Playbook: System Update
+#
+
+- name: System Update
+  hosts: all
+
+  #serial: 1
+
+  pre_tasks:
+
+  - name: Running pre tasks routine
+    shell: echo 'I":" Beginning to configure the server..'
+
+  - name: Purging apt lists
+    file: path=/var/lib/apt/lists state=absent force=yes
+
+  - name: Make sure apt lists directory exists
+    file: path=/var/lib/apt/lists state=directory
+
+  - name: Ensuring /var/lib/apt/lists/partial exists
+    file: path=/var/lib/apt/lists/partial state=directory
+
+  - name: Pretask | Update apt cache
+    apt: update_cache=yes
+    register: apt_update
+
+  tasks:
+
+  - name: System Hostname
+    command: hostname -f
+    register: result_hostname
+    changed_when: False
+  - debug: msg="The hostname for {{ inventory_hostname }} is {{ result_hostname.stdout }}"
+
+  - name: System IP Address
+    command: hostname -i
+    register: result_ipaddr
+    changed_when: False
+  - debug: msg="The IP Address for {{ inventory_hostname }} is {{ result_ipaddr.stdout }}"
+       
+  - name: System Release
+    command: lsb_release -d
+    register: result_release
+    changed_when: False
+  - debug: msg="The Ubuntu release for {{ inventory_hostname }} is {{ result_release.stdout }}"
+
+  - name: System Kernel Release
+    command: uname -r
+    register: result_uname
+    changed_when: False
+  - debug: msg="The Linux Kernel release for {{ inventory_hostname }} is {{ result_uname.stdout }}"
+
+  - name: System Updates
+    command: /usr/lib/update-notifier/update-motd-updates-available
+    register: result_updates_avail
+    changed_when: False
+  - debug: msg="The Ubuntu updates for {{ inventory_hostname }} are {{ result_updates_avail.stdout }}"
+
+  - name: Ubuntu Updates
+    command: /usr/lib/update-notifier/apt_check.py -p
+    register: result_updates_list
+    changed_when: False
+  - debug: msg="The Ubuntu updates for {{ inventory_hostname }} are {{ result_updates_list.stdout }}"
+
+  - name: Update apt package list
+    apt: update_cache=yes #cache_valid_time=3600
+#    when: apt_update is not defined
+
+  - name: Perform server upgrade
+    apt: upgrade=yes
+
+  - name: Check if packages need to be autoremoved
+    command: apt-get --dry-run autoremove
+    register: check_autoremove
+    changed_when: False
+
+  - name: Autoremove unused packages
+    command: apt-get -y autoremove
+    when: "'packages will be REMOVED' in check_autoremove.stdout"
+
+  - name: Check if packages need to be autocleaned
+    command: apt-get --dry-run autoclean
+    register: check_autoclean
+    changed_when: False
+
+  - name: Clean up package cache
+    command: apt-get -y autoclean
+    when: "'Del' in check_autoclean.stdout"
+
+  - name: Check if reboot is required
+    stat: path=/var/run/reboot-required get_md5=no
+    register: sym
+
+  - name: Reboot server if required
+    command: shutdown -r now "$ID-Commit | Ansible updates triggered"
+    when: sym.stat.exists is defined and sym.stat.exists
+    async: 0
+    poll: 0
+    ignore_errors: true
+
+  - name: Wait for server to come back after reboot
+    local_action: wait_for host={{ ansible_ssh_host }}
+      port={{ ansible_ssh_port }}
+      delay=200
+      timeout=300
+      connect_timeout=180
+      state=started
+    when: sym.stat.exists is defined and sym.stat.exists
+

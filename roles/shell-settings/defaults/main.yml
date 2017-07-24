@@ -1,0 +1,4 @@
+---
+# defaults file for shell-settings
+
+default_shell: /bin/bash

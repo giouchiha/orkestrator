@@ -1,0 +1,7 @@
+---
+# defaults file for common
+  locale: en_US.UTF-8
+  #timezone: America/Mexico_City
+  default_shell: /bin/bash
+  hostname_fqdn: "{{ansible_fqdn}}"
+  hostname_name: "{{hostname_fqdn.split('.').0}}"

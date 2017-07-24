@@ -1,0 +1,12 @@
+/var/log/cmdhist.log
+{
+        rotate 4
+        weekly
+        missingok
+        notifempty
+        compress
+        delaycompress
+        postrotate
+                invoke-rc.d rsyslog reload > /dev/null
+        endscript
+}

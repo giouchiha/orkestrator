@@ -1,0 +1,26 @@
+deb http://archive.ubuntu.com/ubuntu/ lucid main restricted
+deb-src http://archive.ubuntu.com/ubuntu/ lucid main restricted
+
+## Major bug fix updates produced after the final release of the
+## distribution.
+deb http://archive.ubuntu.com/ubuntu/ lucid-updates main restricted
+deb-src http://archive.ubuntu.com/ubuntu/ lucid-updates main restricted
+
+## N.B. software from this repository is ENTIRELY UNSUPPORTED by Ubuntu
+deb http://archive.ubuntu.com/ubuntu/ lucid universe
+deb-src http://archive.ubuntu.com/ubuntu/ lucid universe
+deb http://archive.ubuntu.com/ubuntu/ lucid-updates universe
+deb-src http://archive.ubuntu.com/ubuntu/ lucid-updates universe
+
+## N.B. software from this repository is ENTIRELY UNSUPPORTED by Ubuntu 
+deb http://archive.ubuntu.com/ubuntu/ lucid multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ lucid multiverse
+deb http://archive.ubuntu.com/ubuntu/ lucid-updates multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ lucid-updates multiverse
+
+deb http://security.ubuntu.com/ubuntu lucid-security main restricted
+deb-src http://security.ubuntu.com/ubuntu lucid-security main restricted
+deb http://security.ubuntu.com/ubuntu lucid-security universe
+deb-src http://security.ubuntu.com/ubuntu lucid-security universe
+deb http://security.ubuntu.com/ubuntu lucid-security multiverse
+deb-src http://security.ubuntu.com/ubuntu lucid-security multiverse

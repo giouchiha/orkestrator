@@ -1,0 +1,13 @@
+#
+# SSH Client config file
+#
+
+# GIT Server for Infrastructure code
+Host {{infra_git_server_address}}
+  Hostname {{infra_git_server_address}}
+  Port {{infra_git_server_port}}
+  User {{infra_git_server_user}}
+  IdentityFile /var/lib/jenkins/.ssh/id-{{marca}}-jenkins.rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+  LogLevel error

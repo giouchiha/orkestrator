@@ -1,0 +1,292 @@
+---
+# tasks file for jenkins-service
+
+- name: Install python-software-properties
+  apt: name=python-software-properties state=present
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Install python curl module
+  apt: name=python-pycurl state=present
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+# Dependencias requeridas para conexion remota en python
+- name: Install python-dev dependencies
+  apt: name={{ item }} state=present
+  with_items:
+    - build-essential
+    - libssl-dev
+    - libffi-dev
+    - python-dev
+    - python-pip
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+# xvfb requerido para pruebas con selenium
+- name: Install xvfb dependencies
+  apt: name=xvfb state=present
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+# chromium requerido para pruebas con selenium y el webdriver
+- name: Install chromium-browser dependencies
+  apt: name={{ item }} state=present
+  with_items:
+    - chromium-browser
+    - chromium-chromedriver
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+# Put chromedriver on path
+- name: Create a symlink on PATH
+  file: src=/usr/lib/chromium-browser/chromedriver dest=/usr/bin/chromedriver state=link
+  with_items:
+    - chromium-browser
+    - chromium-chromedriver
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Add jenkins apt repo key
+  apt_key: data="{{ lookup('file', 'jenkins-ci.org.key') }}" state=present
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Add Jenkins repository
+  apt_repository: repo='{{ jenkins.deb.repo }}' state=present update_cache=yes
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Install Jenkins dependencies
+  apt: name={{ item }} state=present
+  with_items:
+    - openjdk-8-jre
+    - openjdk-8-jdk
+    - git
+    - curl
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Install Jenkins package
+  apt: name=jenkins state=latest
+  register: jenkins_install
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Ensure Jenkins is runnig and started at boot time
+  service: name=jenkins state=started enabled=yes
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Configure Jenkins Port for Debian
+  lineinfile: dest=/etc/default/jenkins regexp=^HTTP_PORT= line=HTTP_PORT={{jenkins_http_port}}
+  register: config_changed
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Restart jenkins now
+  service: name=jenkins state=restarted
+  when: config_changed.changed
+  tags:
+    - jenkins_service
+    - jenkins_service_install
+
+- name: Configure Jenkins default runtime settings
+  template: src=default-jenkins.j2 dest=/etc/default/jenkins owner=root group=root mode=0644
+  tags:
+    - jenkins_service
+    - jenkins_service_config
+
+- name: Configure Jenkins Prefix for Debian
+  lineinfile: dest=/etc/default/jenkins regexp=^PREFIX= line=PREFIX={{jenkins_url_prefix}}
+  when: jenkins_url_prefix is defined
+  tags:
+    - jenkins_service
+    - jenkins_service_config
+
+- name: Configure Jenkins E-mail
+  template: src=hudson.tasks.Mailer.xml.j2 dest={{ jenkins_lib }}/hudson.tasks.Mailer.xml owner=jenkins group=jenkins mode=0644
+  when: email is defined
+  tags:
+    - jenkins_service
+    - jenkins_service_config
+
+- name: Create Jenkins init.groovy.d directory
+  file:
+    path: "{{ jenkins_home }}/init.groovy.d"
+    owner: jenkins
+    group: jenkins
+    mode: 0750
+    state: directory
+  tags:
+    - jenkins_service
+    - jenkins_service_config
+
+- name: Setting groovy basic security for unattended installation
+  template: src=basic-security.groovy.j2 dest={{ jenkins_home }}/init.groovy.d/basic-security.groovy owner=jenkins group=jenkins mode=0640
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_config
+
+- name: Restart jenkins now
+  service: name=jenkins state=restarted
+  tags:
+    - jenkins_service
+    - jenkins_service_config
+
+- name: "{{ startup_delay_s | default(30) }}s delay while starting Jenkins"
+  wait_for: host=localhost port={{ jenkins_http_port }} delay={{ startup_delay_s | default(30) }}
+  tags:
+    - jenkins_service
+    - jenkins_service_cli
+
+- name: "Create Jenkins CLI destination directory: {{ jenkins_dest }}"
+  file: path={{ jenkins_dest }} state=directory
+  tags:
+    - jenkins_service
+    - jenkins_service_cli
+
+- name: Get Jenkins CLI
+  get_url: url=http://localhost:{{ jenkins_http_port }}/jnlpJars/jenkins-cli.jar dest={{ jenkins.cli_dest }} mode=0440
+  register: jenkins_local_cli
+  until: "'OK' in jenkins_local_cli.msg or 'file already exists' in jenkins_local_cli.msg"
+  retries: 5
+  delay: 10
+  tags:
+    - jenkins_service
+    - jenkins_service_cli
+
+- name: Create Jenkins updates folder.
+  file:
+    path: "{{ jenkins_home }}/updates"
+    owner: jenkins
+    group: jenkins
+    mode: 0755
+    state: directory
+  register: jenkins_plugins_folder_create
+  tags:
+    - jenkins_service
+    - jenkins_service_plugins
+
+- name: Update Jenkins plugin data.
+  shell: curl -L https://updates.jenkins-ci.org/update-center.json | sed '1d;$d' > "{{ jenkins_home }}/updates/default.json"
+  args:
+    creates: "{{ jenkins_home }}/updates/default.json"
+  tags:
+    - jenkins_service
+    - jenkins_service_plugins
+
+- name: Permissions for default.json updates info.
+  file:
+    path: "{{ jenkins_home }}/updates/default.json"
+    owner: jenkins
+    group: jenkins
+    mode: 0755
+  when: jenkins_plugins_folder_create.changed
+  tags:
+    - jenkins_service
+    - jenkins_service_plugins
+
+- name: Install Jenkins plugins
+  shell: java -jar {{ jenkins.cli_dest }} -s http://localhost:{{ jenkins_http_port }} install-plugin {{ item }} --username {{ jenkins_admin_username }} --password {{ jenkins_admin_password }}
+  with_items: "{{ jenkins_plugins }}"
+  when: jenkins_admin_password != ""
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_plugins
+
+- name: Copy config file for General settings
+  copy: src=var/lib/jenkins/config.xml dest=/var/lib/jenkins/config.xml owner=jenkins group=jenkins mode=0644
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_general_config
+
+- name: Change owner and permissions to jenkins general config file
+  shell: chown jenkins:jenkins /var/lib/jenkins/config.xml
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_general_config
+
+- name: Copy config file for CSS theme
+  copy: src=var/lib/jenkins/org.codefirst.SimpleThemeDecorator.xml dest=/var/lib/jenkins/org.codefirst.SimpleThemeDecorator.xml owner=jenkins group=jenkins mode=0644
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_plugins
+
+- name: Copy config file for plugin shiningpanda python installations
+  copy: src=var/lib/jenkins/jenkins.plugins.shiningpanda.tools.PythonInstallation.xml dest=/var/lib/jenkins/jenkins.plugins.shiningpanda.tools.PythonInstallation.xml owner=jenkins group=jenkins mode=0644
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_plugins
+
+- name: Copy config file for plugin Xvfb installations
+  copy: src=var/lib/jenkins/org.jenkinsci.plugins.xvfb.Xvfb.xml dest=/var/lib/jenkins/org.jenkinsci.plugins.xvfb.Xvfb.xml owner=jenkins group=jenkins mode=0644
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_plugins
+
+- name: Create Jenkins Jobs directory
+  file:
+    path: "{{ jenkins_home }}/jobs"
+    owner: jenkins
+    group: jenkins
+    mode: 0750
+    state: directory
+  tags:
+    - jenkins_service
+    - jenkins_service_jobs
+
+- name: Move current jenkins jobs directory
+  shell: mv /var/lib/jenkins/jobs /var/lib/jenkins/jobs-orig
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_jobs
+
+- name: Copy config files for jenkins jobs
+  shell: cp -a /etc/ansible/roles/jenkins-service/files/var/lib/jenkins/jobs /var/lib/jenkins/
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_jobs
+
+- name: Change owner and permissions to jenkins jobs directory
+  file:
+    path: "{{ jenkins_home }}/jobs"
+    owner: jenkins
+    group: jenkins
+    mode: 0750
+    state: directory
+  notify:
+    - 'restart jenkins'
+  tags:
+    - jenkins_service
+    - jenkins_service_jobs

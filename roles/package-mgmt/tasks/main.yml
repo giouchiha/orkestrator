@@ -1,0 +1,137 @@
+---
+# tasks file for package-mgmt
+
+- name: Remove unneeded packages to speed up Ansible on Ubuntu
+  apt: name={{ item }} state=absent purge=yes
+  with_items:
+    - landscape-client
+    - landscape-common
+    - whoopsie
+  when: ansible_distribution == 'Ubuntu'
+  tags:
+    - clean_package_mgmt
+
+- name: Remove unattended upgrades packages to eliminate kernel conflicts and fill / space.
+  apt: name={{ item }} state=absent purge=yes
+  with_items:
+    - unattended-upgrades
+  tags:
+    - clean_package_mgmt
+
+- name: Remove cron entries which use apt-get to update apt lists automatically
+  lineinfile: dest=/etc/crontab regexp='apt-get' state=absent
+  tags:
+    - clean_package_mgmt
+
+- name: Check if packages need to be autoremoved
+  command: apt-get --dry-run autoremove
+  register: check_autoremove
+  changed_when: False
+  tags:
+    - clean_package_mgmt
+
+- name: Autoremove unused packages
+  command: apt-get -y autoremove
+  when: "'packages will be REMOVED' in check_autoremove.stdout"
+  tags:
+    - clean_package_mgmt
+
+- name: Check if packages need to be autocleaned
+  command: apt-get --dry-run autoclean
+  register: check_autoclean
+  changed_when: False
+  tags:
+    - clean_package_mgmt
+
+- name: Clean up package cache
+  command: apt-get -y autoclean
+  when: "'Del' in check_autoclean.stdout"
+  tags:
+    - clean_package_mgmt
+
+#- name: Purging apt lists
+#  file: path=/var/lib/apt/lists state=absent force=yes
+#  tags:
+#    - purge_package_mgmt
+
+#- name: Make sure apt lists directory exists
+#  file: path=/var/lib/apt/lists state=directory
+#  tags:
+#    - purge_package_mgmt
+
+#- name: Ensuring /var/lib/apt/lists/partial exists
+#  file: path=/var/lib/apt/lists/partial state=directory
+#  tags:
+#    - purge_package_mgmt
+
+#- name: List packages removed but not purged which remains with rc status on dpkg database
+#  shell: dpkg -l | egrep '^rc' | cut -d' ' -f3
+#  register: result_dpklist
+#  changed_when: False
+#  tags:
+#    - purge_package_mgmt
+
+#- name: List packages removed but not purged which remains with rc status on dpkg database
+#  debug: msg="The list of packaes in rc state for {{ inventory_hostname }} are {{ result_dpklist.stdout }}"
+#  changed_when: False
+#  tags:
+#    - purge_package_mgmt
+
+#- name: Purge packages removed but not purged which remains with rc status on dpkg database
+#  shell: dpkg --purge `COLUMNS=300 dpkg -l | egrep '^rc' | cut -d' ' -f3`
+#  ignore_errors: True
+#  changed_when: False
+#  tags:
+#    - purge_package_mgmt
+
+- name: Purge old kernel images packages
+  shell: dpkg --list | grep 'linux-image' | awk '{ print $2 }' | sort -V | sed -n '/'"$(uname -r | sed "s/\([0-9.-]*\)-\([^0-9]\+\)/\1/")"'/q;p' |sort -r | tail -n +3 | xargs sudo apt-get -y purge
+  ignore_errors: True
+  changed_when: False
+  tags:
+    - purge_package_mgmt
+
+- name: Purge old kernel extra images packaes
+  shell: dpkg --list | grep 'linux-image-extra' | awk '{ print $2 }' | sort -V | sed -n '/'"$(uname -r | sed "s/\([0-9.-]*\)-\([^0-9]\+\)/\1/")"'/q;p' |sort -r | tail -n +3 | xargs sudo apt-get -y purge
+  ignore_errors: True
+  changed_when: False
+  tags:
+    - purge_package_mgmt
+
+- name: Purge old kernel header packaes
+  shell: dpkg --list | grep 'linux-headers' | awk '{ print $2 }' | sort -V | sed -n '/'"$(uname -r | sed "s/\([0-9.-]*\)-\([^0-9]\+\)/\1/")"'/q;p' |sort -r | tail -n +3 | xargs sudo apt-get -y purge
+  ignore_errors: True
+  changed_when: False
+  tags:
+    - purge_package_mgmt
+
+- name: Setting up apt US official repositories for Ubuntu lucid
+  copy: src=apt/lucid.sources.list.us dest=/etc/apt/sources.list owner=root group=root mode=0644
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'lucid'
+  tags:
+    - reposetup_package_mgmt
+
+- name: Setting up apt US official repositories for Ubuntu precise
+  copy: src=apt/precise.sources.list.us dest=/etc/apt/sources.list owner=root group=root mode=0644
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'precise'
+  tags:
+    - reposetup_package_mgmt
+
+- name: Setting up apt US official repositories for Ubuntu trusty
+  copy: src=apt/trusty.sources.list.us dest=/etc/apt/sources.list owner=root group=root mode=0644
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
+  tags:
+    - reposetup_package_mgmt
+
+- name: Update apt cache lists
+  #apt: update_cache=yes cache_valid_time=3600
+  apt: update_cache=yes
+  #when: apt_update is not defined
+  tags:
+    - reposetup_package_mgmt
+
+ #- name: Setting up apt local settins
+  #copy: src=apt/50tmpremount dest=/etc/apt/apt.conf.d/50tmpremount owner=root group=root mode=0644
+  #copy: src=apt/88apt-proxy dest=/etc/apt/apt.conf.d/88apt-proxy owner=root group=root mode=0644
+  #tags:
+  #  - package_mgmt

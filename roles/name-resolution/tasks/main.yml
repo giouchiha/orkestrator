@@ -1,0 +1,18 @@
+---
+# tasks file for name-resolution
+
+- name: Set hostname on kernel
+  hostname: name={{ hostname_name }}
+  tags:
+    - name_resolution_hostname
+
+- name: Set hostname on /etc/hostname
+  copy: content='{{ hostname_name }}' dest='/etc/hostname' force='yes'
+  when: hostname_name is defined
+  tags:
+    - name_resolution_hostname
+
+- name: Setting up local name resolution on /etc/hosts
+  template: src=default-hosts.j2 dest=/etc/hosts backup=yes owner=root group=root mode=0644
+  tags:
+    - name_resolution_hosts

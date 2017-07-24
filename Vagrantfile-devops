@@ -1,0 +1,50 @@
+# vi: set ft=ruby :
+
+# Description: Vagrantfile for vagrant-virtualbox-devops project.
+# Author: Jorge Armando Medina
+# Email: jorge.medina@koolops.com.mx
+
+# BEGINING, using version 2 format.
+Vagrant.configure(2) do |config|
+
+  # Global settings
+
+  # Import VM based on Ubuntu 16.04.x LTS (xenial) 64-bit
+  config.vm.box = "bento/ubuntu-16.04"
+  # Disable box check update
+  config.vm.box_check_update = false
+
+  # Settings for devops machine
+  config.vm.define "devops", primary: true do |devops|
+    # VM hostname
+    devops.vm.hostname = "devops"
+
+    # VM private networking
+    devops.vm.network "private_network", ip: "192.168.33.10"
+
+    # VM Port forwarding from host
+    devops.vm.network "forwarded_port", guest: 8080, host: 1088
+
+    # Sync vagrant folder
+    devops.vm.synced_folder ".", "/vagrant", disabled: false
+
+    # Deploy basic software requirements and ansible on devops machine.
+    devops.vm.provision :shell, name: "bin/bootstrap.sh", path: "bin/bootstrap.sh"
+    # Deploy SSH Keys on devops machine, only authorized for root.
+    devops.vm.provision :shell, name: "bin/sshkeys.sh", path: "bin/sshkeys.sh"
+
+    # VM admin user
+    devops.ssh.username = "vagrant"
+    devops.ssh.password = "vagrant"
+    devops.ssh.insert_key = true
+  end
+
+  # VMs default settings for virtualbox provider
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--cpuexecutioncap", "70"]
+    vb.memory = "512"
+    vb.customize ["modifyvm", :id, "--cpus", "1"]
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
+  end
+end
+# END, using version 2 format.

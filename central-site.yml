@@ -1,0 +1,8 @@
+---
+# file: central-site.yml
+
+#
+# Playbooks para el Sitio Central
+#
+
+- include: central-devops-servers.yml

@@ -1,0 +1,46 @@
+---
+# tasks file for shell-tools
+
+#- name: Update apt package list
+#  apt: update_cache=yes cache_valid_time=3600
+#  tags:
+#    - package_mgmt
+
+- name: Install shell tool packages
+  apt: pkg={{item}} state=installed
+  with_items:
+    - man-db
+    - screen
+    - vim
+    - psmisc
+    - bzip2
+    - less
+    - unzip
+    - lzop
+    - wget
+    - rsync
+    - cron
+    - mlocate
+    - htop
+    - iftop
+    - iotop
+    - dnsutils
+    - ethtool
+    - tcpdump
+    - tshark
+    - traceroute
+    - nmap
+    - elinks
+  tags:
+    - package_mgmt
+    - shell_tools
+
+- name: Set vim dot files
+  copy: src=vim/root/1404vimrc dest=/root/.vimrc owner=root group=root mode=0640
+  tags:
+    - shell_tools
+
+- name: set screen dot files
+  copy: src=screen/root/dotscreenrc-simple dest=/root/.screenrc owner=root group=root mode=0640
+  tags:
+    - shell_tools

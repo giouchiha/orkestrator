@@ -1,0 +1,37 @@
+---
+#
+# Playbook: Central Servers
+#
+
+- hosts: central
+
+#  serial: 10
+
+  pre_tasks:
+
+  - name: Running pre tasks routine
+    shell: echo 'Local Bot":" Beginning to configure the server..'
+
+  - name: Pretask | Update apt cache
+    apt: update_cache=yes
+    register: apt_update
+
+  roles:
+    - name-resolution
+    - common
+    - package-mgmt
+    - shell-settings
+    - shell-tools
+    - rsyslog-service
+    - openssh-service
+    - mosh-service
+    - ntp-service
+
+#
+# Individual playbooks for group of servers on central site are:
+#
+
+# Default
+#- include: central-devops-servers.yml
+# Extras
+#- include: central-test-avail.yml

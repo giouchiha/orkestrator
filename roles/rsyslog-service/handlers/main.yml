@@ -1,0 +1,12 @@
+---
+# handlers file for rsyslog-service
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
+  tags:
+    - rsyslog_service
+
+- name: restart cron
+  service: name=cron state=restarted
+  tags:
+    - rsyslog_service

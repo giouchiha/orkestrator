@@ -1,0 +1,9 @@
+---
+# defaults file for name-resolution
+
+#hostname_fqdn: "{{ansible_fqdn}}"
+#hostname_name: "{{hostname_fqdn.split('.').0}}"
+
+hostname_fqdn: "{{inventory_hostname}}"
+hostname_name: "{{hostname_fqdn.split('.').0}}"
+

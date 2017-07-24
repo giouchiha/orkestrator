@@ -1,0 +1,30 @@
+---
+#
+# Playbook: Central DEVOPS Servers
+#
+
+- hosts: central-devops
+
+#  serial: 5
+
+  pre_tasks:
+
+  - name: Running pre tasks routine
+    shell: echo 'Local Bot":" Beginning to configure the server..'
+
+  - name: Pretask | Update apt cache
+    apt: update_cache=yes
+    register: apt_update
+
+  roles:
+    - name-resolution
+    - common
+    - package-mgmt
+    - shell-settings
+    - shell-tools
+    - rsyslog-service
+    - openssh-service
+    - mosh-service
+    - ntp-service
+    - jenkins-service
+    - git-client

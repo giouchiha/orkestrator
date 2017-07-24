@@ -1,0 +1,72 @@
+---
+# tasks file for openssh-service
+
+- name: Install openssh packages
+  apt: pkg={{item}} state=installed
+  with_items:
+    - openssh-server
+  tags:
+    - openssh_service
+
+- name: Setting up ssh service
+  template: src=sshd_config.j2
+    dest=/etc/ssh/sshd_config
+    backup=yes
+    owner=0 group=0 mode=0644
+    validate='/usr/sbin/sshd -T -f %s'
+  notify:
+    - restart ssh
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'precise'
+  tags:
+    - openssh_service
+
+- name: Setting up ssh service for central servers
+  template: src=sshd_config-central.j2
+    dest=/etc/ssh/sshd_config
+    backup=yes
+    owner=0 group=0 mode=0644
+    validate='/usr/sbin/sshd -T -f %s'
+  notify:
+    - restart ssh
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and 'central' in group_names
+  tags:
+    - openssh_service
+
+- name: Setting up ssh service for local servers
+  template: src=sshd_config-local.j2
+    dest=/etc/ssh/sshd_config
+    backup=yes
+    owner=0 group=0 mode=0644
+    validate='/usr/sbin/sshd -T -f %s'
+  notify:
+    - restart ssh
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and 'local' in group_names
+  tags:
+    - openssh_service
+
+- name: Setting up ssh service
+  template: src=sshd_config-xenial.j2
+    dest=/etc/ssh/sshd_config
+    backup=yes
+    owner=0 group=0 mode=0644
+    validate='/usr/sbin/sshd -T -f %s'
+  notify:
+    - restart ssh
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+  tags:
+    - openssh_service
+
+- name: Set issue.net banner
+  copy: src=issue/issue.net-en dest=/etc/issue.net owner=root group=root mode=0644
+  tags:
+    - openssh_service
+
+- name: Setting up directory for root's ssh authorized keys
+  file: path=/root/.ssh state=directory
+  tags:
+    - openssh_service
+
+- name: Start ssh service
+  service: name=ssh state=started enabled=yes
+  tags:
+    - openssh_service
