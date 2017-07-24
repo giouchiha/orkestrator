@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.13">
+  <actions/>
+  <description>This Pipeline BUILD, TEST and DEPLOY the Infrastructure&apos;s code on Central Servers.</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.DisableConcurrentBuildsJobProperty/>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.25">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.36.1">
+    <script>// Groovy Pipeline
+node {
+  stage (&apos;01-BUILD_INFRA&apos;) {
+    build &apos;01-BUILD_INFRA&apos;
+  }
+  stage (&apos;02-TEST_INFRA&apos;) {
+    build &apos;02-TEST_INFRA&apos;
+  }
+  stage (&apos;03-DEPLOY_INFRA&apos;) {
+    build &apos;03-DEPLOY_INFRA&apos;
+  }
+  stage (&apos;04-DEPLOY_GENERAL_ROLES&apos;) {
+    build &apos;222-local-development-central-devops-deploy-ansible-general-roles&apos;
+  }
+  stage (&apos;05-DEPLOY_JENKINS_SERVICE&apos;) {
+  build &apos;333-local-development-central-devops-deploy-ansible-jenkins-roles&apos;
+  }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

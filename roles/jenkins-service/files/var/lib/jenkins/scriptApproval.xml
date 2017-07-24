@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<scriptApproval plugin="script-security@1.27">
+  <approvedScriptHashes>
+    <string>6bddc11919356f2844a8df309380a0427b824e25</string>
+  </approvedScriptHashes>
+  <approvedSignatures/>
+  <aclApprovedSignatures/>
+  <approvedClasspathEntries/>
+  <pendingScripts>
+    <pendingScript>
+      <context/>
+      <script>stage &apos;devops git-pull build-test-infra&apos;
+build job: &apos;000.1-local-development-central-devops-git-pull-build-test-infra&apos;, parameters: [string(name: &apos;PROJECT&apos;, value: &apos;local&apos;), string(name: &apos;PROJECT_ALIAS&apos;, value: &apos;local&apos;), string(name: &apos;ENVIROMENT&apos;, value: &apos;development&apos;)]
+stage &apos;devops git-pull build-deploy-infra&apos;
+build job: &apos;000.2-local-development-central-devops-git-pull-build-deploy-infra&apos;, parameters: [string(name: &apos;PROJECT&apos;, value: &apos;local&apos;), string(name: &apos;PROJECT_ALIAS&apos;, value: &apos;local&apos;), string(name: &apos;ENVIROMENT&apos;, value: &apos;development&apos;)]
+stage &apos;devops deploy-ansible-general-roles&apos;
+build &apos;222-local-development-central-devops-deploy-ansible-general-roles&apos;
+stage &apos;itop-deploy ansible-general-roles&apos;
+build &apos;223-local-development-central-itop-deploy-ansible-general-roles&apos;
+stage &apos;devops-deploy ansible-jenkins-roles&apos;
+build &apos;333-local-development-central-devops-deploy-ansible-jenkins-roles&apos;
+stage &apos;itop-deploy ansible-itop-roles&apos;
+build &apos;334-local-development-central-itop-deploy-ansible-itop-roles&apos;</script>
+      <language>groovy</language>
+    </pendingScript>
+  </pendingScripts>
+  <pendingSignatures/>
+  <pendingClasspathEntries/>
+</scriptApproval>
