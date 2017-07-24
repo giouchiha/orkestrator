@@ -9,8 +9,7 @@
 5. [Limpiando](#limpiando)
 7. [Destruyendo](#destruyendo)
 8. [Mejores prácticas](#mejorespracticas)
-9. [Contribuyendo](#contribuyendo)
-10. [Referencias](#referecias)
+9. [Referencias](#referecias)
 
 ## Introducción
 
@@ -189,12 +188,6 @@ Una vez desarrollado el playbook del rol, se debe agregar el rol al playbook de 
 Se deben documentar los tags en el documento de la matriz del sistema de gestión de configuraciones que se adjunta.
 
 Los cambios deben integrarse al repositorio git ansible en la rama development y realizar un merge request para que se valide.
-
-## Contribuyendo
-
-Si desea contribuir al código se recomienda clonar el repositorio y trabajar en un feature branch o en development y hacer pull request para integrar a la rama master del ambiente de production.
-
-La rama master está protegida para que solo usuarios con rol de owner o master puedan hacer commits, la forma más segura de integrar cambios es hacer pull request y peer review del código, para validarlo y probarlo en el ambiente de pruebas antes de poder integrar el código al ambiente productivo.
 
 ## Referencias
 
