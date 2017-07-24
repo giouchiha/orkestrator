@@ -15,8 +15,8 @@ export DEBUG=1
 set -e
 
 # vars
-GIT_INFRA_REPO=git@bitbucket.org:koolops/infra.git
-GIT_INFRA_BRANCH=development
+GIT_INFRA_REPO=https://github.com/koolops/orkestrator.git
+GIT_INFRA_BRANCH=master
 INFRA_TMP=/tmp/infra
 
 # functions
@@ -29,14 +29,14 @@ echo
 git clone -b ${GIT_INFRA_BRANCH} --single-branch ${GIT_INFRA_REPO} ${INFRA_TMP}
 
 echo
-echo "Build development enviroment for local/local project on ${INFRA_TMP}."
+echo "Build development enviroment for local project on ${INFRA_TMP}."
 echo
 cd ${INFRA_TMP}
 git checkout -- ansible.cfg inventory/local/development
-bin/build.sh local local development
+bin/build.sh local development
 
 echo
-echo "Test check for development enviroment for local/local project on ${INFRA_TMP}."
+echo "Test check for development enviroment for local project on ${INFRA_TMP}."
 echo
 cd ${INFRA_TMP}
 ansible-playbook central-site.yml --syntax-check
