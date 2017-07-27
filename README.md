@@ -37,7 +37,7 @@ Por lo tanto, nuestro flujo de trabajo está basado en un Pipeline de Continuous
 
 SCM -> BUILD -> TEST -> DEPLOY
 
-Todos los scripts, archivos de configuración, plantillas, playbooks estarán almacenados en un repositorio de código basado en Git para mantenerlo versionado, para esto usaremos la plataforma Bitbucket con repositorios privados, sin embargo, se pueden usar otras plataformas como Github, o usar GitLab en infraestructura privada.
+Todos los scripts, archivos de configuración, plantillas, playbooks estarán almacenados en un repositorio de código basado en Git para mantenerlo versionado, para esto usaremos la plataforma Github con repositorios público, sin embargo, se pueden usar otras plataformas como Bitbucket para proyectos privados, o bien usar GitLab en infraestructura privada.
 
 Para mantener un mejor control de cambios en el código fuente de la infraestructura, usaremos un flujo de trabajo basado en branches para las diferentes fases del desarrollo, pruebas y produción, por lo tanto nuestro flujo de trabajo estará basado en Git Flow.
 
