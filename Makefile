@@ -1,11 +1,11 @@
 #
-# Makefile for Kool iTop
+# Makefile for Kool Orkestrator
 #
 # author: jorge.medina@koolops.com.mx
 # desc: Script to build the vagrant development enviroment.
 
 NAME = orkestrator
-VERSION = 0.9.0
+VERSION = 1.0.0
 
 .PHONY: all vagrant bootstrap build test deploy clean destroy help
 
@@ -67,8 +67,12 @@ help:
 	@echo ""
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo ""
-	@echo "  vagrant Buildss the local development enviroment."
-	@echo "  clean cleans local changes on ansible settings."
-	@echo "  destroy destroys the local development enviroment."
+	@echo "  vagrant   Provision the local development enviroment."
+	@echo "  bootstrap Bootstrap the local development enviroment."
+	@echo "  build     Builds the local development enviroment."
+	@echo "  test      Tests for the local development enviroment."
+	@echo "  deploy    Deploy the local development enviroment."
+	@echo "  clean     Cleans local changes on ansible settings."
+	@echo "  destroy   Destroys the local development enviroment."
 	@echo ""
 	@echo ""
