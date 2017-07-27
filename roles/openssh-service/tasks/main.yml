@@ -16,31 +16,7 @@
     validate='/usr/sbin/sshd -T -f %s'
   notify:
     - restart ssh
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'precise'
-  tags:
-    - openssh_service
-
-- name: Setting up ssh service for central servers
-  template: src=sshd_config-central.j2
-    dest=/etc/ssh/sshd_config
-    backup=yes
-    owner=0 group=0 mode=0644
-    validate='/usr/sbin/sshd -T -f %s'
-  notify:
-    - restart ssh
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and 'central' in group_names
-  tags:
-    - openssh_service
-
-- name: Setting up ssh service for local servers
-  template: src=sshd_config-local.j2
-    dest=/etc/ssh/sshd_config
-    backup=yes
-    owner=0 group=0 mode=0644
-    validate='/usr/sbin/sshd -T -f %s'
-  notify:
-    - restart ssh
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and 'local' in group_names
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
   tags:
     - openssh_service
 
