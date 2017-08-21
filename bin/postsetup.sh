@@ -29,14 +29,14 @@ echo
 git clone -b ${GIT_INFRA_BRANCH} --single-branch ${GIT_INFRA_REPO} ${INFRA_TMP}
 
 echo
-echo "Build development enviroment for local project on ${INFRA_TMP}."
+echo "Build development environment for local project on ${INFRA_TMP}."
 echo
 cd ${INFRA_TMP}
 git checkout -- ansible.cfg inventory/local/development
 bin/build.sh local development
 
 echo
-echo "Test check for development enviroment for local project on ${INFRA_TMP}."
+echo "Test check for development environment for local project on ${INFRA_TMP}."
 echo
 cd ${INFRA_TMP}
 ansible-playbook central-site.yml --syntax-check
