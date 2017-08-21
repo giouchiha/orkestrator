@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Jorge Armando Medina
-  description: Common tasks for all enviroments machines
+  description: Common tasks for all environments machines
   company: KoolOps
   license: MIT
   min_ansible_version: 1.4

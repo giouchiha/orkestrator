@@ -8,8 +8,8 @@
 
 # vars
 PROJECT=$1
-ENVIROMENT=$2
-INVENTORY=inventory/${PROJECT}/${ENVIROMENT}
+ENVIRONMENT=$2
+INVENTORY=inventory/${PROJECT}/${ENVIRONMENT}
 SERVER=$3
 USER=$4
 
@@ -27,4 +27,4 @@ echo "Running playbook extra_plays/copy-ssh-key-to-server.yml over $SERVER serve
 ansible-playbook -i $INVENTORY extra_plays/copy-ssh-key-to-server.yml --limit=$SERVER -e "ansible_ssh_user=$USER" -k -s -K
 
 # For AWS
-#ansible-playbook -i $INVENTORY extra_plays/copy-ssh-key-to-server.yml --limit=$SERVER -e "ansible_ssh_user=$USER" -e "ansible_ssh_private_key_file=/etc/ansible/.ssh/%PROJECT_%ENVIROMENT%_infra.pem" -s -K
+#ansible-playbook -i $INVENTORY extra_plays/copy-ssh-key-to-server.yml --limit=$SERVER -e "ansible_ssh_user=$USER" -e "ansible_ssh_private_key_file=/etc/ansible/.ssh/%PROJECT_%ENVIRONMENT%_infra.pem" -s -K
