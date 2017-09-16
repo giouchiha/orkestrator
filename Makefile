@@ -5,7 +5,7 @@
 # desc: Script to build the vagrant development environment.
 
 NAME = orkestrator
-VERSION = 1.0.0
+VERSION = 1.0.1
 
 .PHONY: all vagrant bootstrap build test deploy clean destroy help
 

@@ -4,7 +4,7 @@
 
 1. [Introducción](#introducci-n)
 2. [Requisitos](#requisitos)
-3. [Construcción](#construccion)
+3. [Construcción](#construcci-n)
 4. [Despliegue](#despliegue)
 5. [Limpiando](#limpiando)
 7. [Destruyendo](#destruyendo)
