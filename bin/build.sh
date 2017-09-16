@@ -8,7 +8,7 @@
 #
 # Requerements:
 # available projects: local
-# available environments: development, test, production.
+# available environments: development, testing, production.
 
 # Enable debug mode and log to file
 export DEBUG=1
